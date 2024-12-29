@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AR Web Application</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="errorModal" class="error-modal">
+        <h3 id="errorTitle">Error</h3>
+        <p id="errorMessage"></p>
+        <p id="errorDetails" class="error-details"></p>
+        <button class="action-button" onclick="window.initializeAR()">Retry</button>
+    </div>
+
+    <div id="statusIndicator" class="status-indicator">
+        Checking device compatibility...
+    </div>
+
+    <div id="versionInfo" class="version-info"></div>
+
+    <a-scene
+        embedded
+        arjs="sourceType: webcam; 
+              debugUIEnabled: false; 
+              detectionMode: mono_and_matrix;
+              matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;"
+        id="arScene">
+
+        <a-assets>
+            <video 
+                id="arVideo" 
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                preload="auto"
+                playsinline 
+                webkit-playsinline
+                muted
+                loop
+                crossorigin="anonymous">
+            </video>
+        </a-assets>
+
+        <a-marker preset="hiro" id="hiroMarker" smooth="true" smoothCount="5">
+            <a-video
+                src="#arVideo"
+                position="0 0.1 0"
+                rotation="-90 0 0"
+                width="1.6"
+                height="0.9"
+                material="shader: flat; src: #arVideo; transparent: true">
+            </a-video>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script type="module">
+        import { VERSION } from './js/version.js';
+        import { showError, updateStatus } from './js/errorHandling.js';
+        import { checkCameraAvailability, checkCompatibility, initializeCamera } from './js/deviceChecks.js';
+        import { initVideoElement, playVideo } from './js/videoHandler.js';
+
+        const errorModal = document.getElementById('errorModal');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorDetails = document.getElementById('errorDetails');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const scene = document.getElementById('arScene');
+        const hiroMarker = document.getElementById('hiroMarker');
+        const versionInfo = document.getElementById('versionInfo');
+        const arVideo = document.getElementById('arVideo');
+
+        versionInfo.textContent = `v${VERSION}`;
+
+        async function initializeAR() {
+            errorModal.classList.remove('visible');
+            scene.style.display = 'block';
+            
+            if (!checkCompatibility((title, message, details) => 
+                showError(errorModal, errorTitle, errorMessage, errorDetails, scene, title, message, details))) return;
+
+            try {
+                // Initialize video element
+                await initVideoElement(arVideo);
+                
+                const { hasCamera, error } = await checkCameraAvailability();
+                if (!hasCamera) {
+                    throw new Error('No camera available');
+                }
+
+                updateStatus(statusIndicator, 'Initializing camera...');
+                const { success, error: cameraError } = await initializeCamera();
+                
+                if (!success) {
+                    throw cameraError || new Error('Failed to initialize camera');
+                }
+                
+                updateStatus(statusIndicator, 'Looking for marker...');
+
+                hiroMarker.addEventListener('markerFound', () => {
+                    console.log('Marker detected');
+                    updateStatus(statusIndicator, 'Marker detected - Playing video');
+                    playVideo(arVideo);
+                });
+
+                hiroMarker.addEventListener('markerLost', () => {
+                    console.log('Marker lost');
+                    updateStatus(statusIndicator, 'Searching for marker...');
+                });
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError(
+                    errorModal, errorTitle, errorMessage, errorDetails, scene,
+                    'Initialization Error',
+                    'Failed to initialize AR experience.',
+                    `Error: ${error.message || 'Unknown error'}`
+                );
+            }
+        }
+
+        // Handle visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                updateStatus(statusIndicator, 'AR paused');
+                arVideo.pause();
+            } else {
+                updateStatus(statusIndicator, 'Resuming AR...');
+                initializeAR();
+            }
+        });
+
+        // Handle user interaction
+        document.addEventListener('click', () => {
+            if (arVideo.paused) {
+                playVideo(arVideo);
+            }
+        });
+
+        window.initializeAR = initializeAR;
+        document.addEventListener('DOMContentLoaded', initializeAR);
+    </script>
+</body>
+</html>
