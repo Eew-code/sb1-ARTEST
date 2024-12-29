@@ -14,7 +14,7 @@ function App() {
         </p>
         <div className="border-2 border-gray-200 rounded-lg p-4 mb-4">
           <img 
-            src="https://github.com/Eew-code/sb1-5vvr6n/blob/4c3bd81dae41e28df70176184159c98067015f45/public/pattern-HIRO.patt"
+            src="https://github.com/Eew-code/sb1-5vvr6n/blob/277e3acae030d04b037668de2f93aeeb9588398b/public/pattern-markertanner_pleasework_pattern.patt"
             alt="Hiro Marker"
             className="w-48 h-48 mx-auto"
           />
