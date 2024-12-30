@@ -10,7 +10,7 @@ function App() {
         </div>
         <h1 className="text-2xl font-bold mb-4">AR Web Application</h1>
         <p className="text-gray-600 mb-6">
-          To use this AR application, scan the Hiro marker below with your camera:
+          To use this AR application, scan the Hiro marker below with your cameraa:
         </p>
         <div className="border-2 border-gray-200 rounded-lg p-4 mb-4">
           <img 
