@@ -14,7 +14,7 @@ function App() {
         </p>
         <div className="border-2 border-gray-200 rounded-lg p-4 mb-4">
           <img 
-            src="/public/pattern-TAN.png"
+            src="../public/pattern-TAN.png"
             alt="Hiro Marker"
             className="w-48 h-48 mx-auto"
           />
