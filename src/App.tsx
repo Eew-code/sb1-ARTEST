@@ -20,7 +20,7 @@ function App() {
           />
         </div>
         <p className="text-sm text-gray-500">
-          Point your camera at this marker to see the AR content
+          Point your camera at this marker to see the AR content1
         </p>
       </div>
     </div>
