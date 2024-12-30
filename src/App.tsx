@@ -14,7 +14,7 @@ function App() {
         </p>
         <div className="border-2 border-gray-200 rounded-lg p-4 mb-4">
           <img 
-            src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/HIRO.jpg"
+            src="https://raw.githubusercontent.com/Eew-code/sb1-5vvr6n/3c2d477d90df9519b41275f838cc43f0c88136cc/public/pattern-markertanner_pleasework_pattern.patt.patt?token=GHSAT0AAAAAAC4OVYJGHSP4WX7REYZDZGCQZ3SBB6Q"
             alt="Hiro Marker"
             className="w-48 h-48 mx-auto"
           />
